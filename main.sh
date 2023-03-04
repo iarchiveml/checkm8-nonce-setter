@@ -166,44 +166,10 @@ else
     echo "Supported device found."
 fi
 
-echo "Please connect device in DFU mode. Press enter when ready to continue"
+echo "Please connect device in pwned DFU mode. Press enter when ready to continue"
 
 read randomIrrelevant
 
-if [ $device == iPhone10,3 ] || [ $device == iPhone10,6 ]; then
-    git clone https://github.com/MatthewPierson/ipwndfuA11
-    cd ipwndfuA11
-else
-    git clone https://github.com/MatthewPierson/ipwndfu_public.git
-    cd ipwndfu_public
-fi
-echo "Starting ipwndfu"
-
-string=$(../files/lsusb | grep -c "checkm8")
-until [ $string = 1 ];
-do
-    killall iTunes && killall iTunesHelper
-    echo "Waiting 10 seconds to allow you to enter DFU mode"
-    sleep 10
-    echo "Attempting to get into pwndfu mode"
-    echo "Please just enter DFU mode again on each reboot"
-    echo "The script will run ipwndfu again and again until the device is in PWNDFU mode"
-    ./ipwndfu -p
-    string=$(../files/lsusb | grep -c "checkm8")
-done
-
-sleep 3
-
-if [ $device == iPhone10,3 ] || [ $device == iPhone10,6 ]; then
-    echo "Device is an iPhone X, using akayn's signature check remover"
-    ./ipwndfu --patch
-    sleep 1
-else
-    echo "Device is NOT an iPhone X, using Linus's signature check remover"
-    python2 rmsigchks.py
-    sleep 1
-fi
-cd ..
 echo "Device is now in PWNDFU mode with signature checks removed (Thanks to Linus Henze & akayn)"
 
 echo "Entering PWNREC mode"
@@ -212,7 +178,8 @@ cd files
 if [ $device == iPhone10,3 ] || [ $device == iPhone10,6 ]; then
     ./irecovery -f junk.txt
 fi
-
+./irecovery -f ibss."$device".img4
+sleep 2
 ./irecovery -f ibss."$device".img4
 
 if [ $device = iPhone6,1 ] || [ $device = iPhone6,2 ] || [ $device = iPad4,1 ] || [ $device = iPad4,2 ] || [ $device = iPad4,3 ] || [ $device = iPad4,4 ] || [ $device = iPad4,5 ] || [ $device = iPad4,6 ] || [ $device = iPad4,7 ] || [ $device = iPad4,8 ] || [ $device = iPad4,9 ];
